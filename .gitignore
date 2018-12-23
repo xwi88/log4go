@@ -1,0 +1,34 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+debug
+
+# Test binary, build with `go test -c`
+*.test
+
+# Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
+.glide/
+
+.vscode
+.glide
+.idea
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# ignore the vscode temp files
+*.inp
+*.oac
+
+*.log
+*.logs
+*.log.*
+*.logs.*
+
+*.pdf
+*.svg
+*.txt
