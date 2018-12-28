@@ -65,7 +65,7 @@ func Test_NewConsoleWriterWithGlobalSet(t *testing.T) {
 	loggerDefault = NewLogger()
 
 	defer Close()
-	layout = "20060102 150304"
+	layout = "20060102 150405"
 	SetLayout(layout)
 	SetLevel(INFO)
 	WithFullPath(true)
@@ -236,7 +236,7 @@ func Test_NewConsoleWriterWithLayout(t *testing.T) {
 	defer loggerDefaultTest.Close()
 
 	color = true
-	layout = "20060102150304000"
+	layout = "20060102T150405.000-0700"
 	c := generateNewConsoleWriterWithOptions(DEBUG, color, fullColor)
 	var name = "console layout"
 	generateRegisterConsoleWriter(loggerDefaultTest, c, fullPath, funcName, layout)
