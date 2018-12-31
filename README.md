@@ -6,7 +6,7 @@ all-powerful log for go with go module support
 
 - [x] base logger
 - [x] console writer
-- [ ] file writer
+- [x] file writer
 - [ ] kafka writer
 - [ ] net writer
 
