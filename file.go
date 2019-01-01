@@ -26,8 +26,9 @@ type FileWriter struct {
 
 	level int
 
+	// input filename
+	filename string
 	// The opened file
-	filename      string
 	file          *os.File
 	fileBufWriter *bufio.Writer
 	// like "xwi88.log", xwi88 is filenameOnly and .log is suffix
@@ -119,17 +120,16 @@ func (w *FileWriter) Write(r *Record) error {
 		return nil
 	}
 	if w.fileBufWriter == nil {
-		return errors.New("no opened file")
+		return errors.New("FileWriter no opened file")
 	}
-	if _, err := w.fileBufWriter.WriteString(r.String()); err != nil {
-		return err
-	}
-	return nil
+	_, err := w.fileBufWriter.WriteString(r.String())
+	return err
 }
 
 // Init file writer init
 func (w *FileWriter) Init() error {
 	filename := w.filename
+	defaultPerm := "0644"
 	if len(filename) != 0 {
 		w.suffix = filepath.Ext(filename)
 		w.filenameOnly = strings.TrimSuffix(filename, w.suffix)
@@ -139,7 +139,7 @@ func (w *FileWriter) Init() error {
 		}
 	}
 	if w.perm == "" {
-		w.perm = "0644"
+		w.perm = defaultPerm
 	}
 
 	perm, err := strconv.ParseInt(w.perm, 8, 64)
@@ -287,45 +287,24 @@ func (w *FileWriter) Rotate() error {
 
 	filePath := fmt.Sprintf(w.pathFmt, w.variables...)
 
-	if err := os.MkdirAll(path.Dir(filePath), 0755); err != nil {
+	if err := os.MkdirAll(path.Dir(filePath), w.rotatePerm); err != nil {
 		if !os.IsExist(err) {
 			return err
 		}
 	}
 
-	file, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, w.rotatePerm)
-	if err != nil {
+	if file, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, w.rotatePerm); err == nil {
+		w.file = file
+	} else {
 		return err
 	}
-	w.file = file
 
 	if w.fileBufWriter = bufio.NewWriterSize(w.file, 8192); w.fileBufWriter == nil {
-		return errors.New("new fileBufWriter failed")
+		return errors.New("Filewriter new fileBufWriter failed")
 	}
-
+	w.suffix = filepath.Ext(filePath)
+	w.filenameOnly = strings.TrimSuffix(filePath, w.suffix)
 	return nil
-}
-
-func (w *FileWriter) createLogFile() (*os.File, error) {
-	// Open the log file
-	perm, err := strconv.ParseInt(w.perm, 8, 64)
-	if err != nil {
-		return nil, err
-	}
-
-	filepath := path.Dir(w.filename)
-	os.MkdirAll(filepath, os.FileMode(perm))
-
-	fd, err := os.OpenFile(w.filename, os.O_RDWR|os.O_CREATE|os.O_APPEND, os.FileMode(perm))
-	if err == nil {
-		// Make sure file perm is user set perm cause of `os.OpenFile` will obey umask
-		os.Chmod(w.filename, os.FileMode(perm))
-	}
-	w.file = fd
-	if w.fileBufWriter = bufio.NewWriterSize(w.file, 8192); w.fileBufWriter == nil {
-		return nil, errors.New("new fileBufWriter failed")
-	}
-	return fd, err
 }
 
 func getYear(now *time.Time) int {
