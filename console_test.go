@@ -124,6 +124,7 @@ func Test_NewConsoleWriterWithLevel2(t *testing.T) {
 	loggerDefaultTest.Debug("log4go by %s", name)
 	loggerDefaultTest.Info("log4go by %s", name)
 	loggerDefaultTest.Notice("log4go by %s", name)
+	loggerDefaultTest.Notice("log4go by fmt ", 123, " super ", name)
 	loggerDefaultTest.Warn("log4go by %s", name)
 	loggerDefaultTest.Error("log4go by %s", name)
 	loggerDefaultTest.Critical("log4go by %s", name)

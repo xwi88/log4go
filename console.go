@@ -2,6 +2,7 @@ package log4go
 
 import (
 	"fmt"
+	"math"
 	"os"
 )
 
@@ -91,7 +92,7 @@ func NewConsoleWriterWithOptions(option ConsoleWriterOptions) *ConsoleWriter {
 	defaultLevel := DEBUG
 
 	if option.Level <= defaultLevel {
-		defaultLevel = option.Level
+		defaultLevel = int(math.Max(float64(option.Level), 0))
 	}
 	return &ConsoleWriter{
 		level:     defaultLevel,

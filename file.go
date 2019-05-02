@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"path"
 	"path/filepath"
@@ -98,7 +99,7 @@ func NewFileWriter() *FileWriter {
 func NewFileWriterWithOptions(option FileWriterOptions) *FileWriter {
 	defaultLevel := DEBUG
 	if option.Level <= defaultLevel {
-		defaultLevel = option.Level
+		defaultLevel = int(math.Max(float64(option.Level), 0))
 	}
 
 	return &FileWriter{
