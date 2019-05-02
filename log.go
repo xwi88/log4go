@@ -6,6 +6,7 @@ import (
 	"log"
 	"path"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
 )
@@ -38,9 +39,10 @@ const (
 const (
 	// default size or min size for record channel
 	recordChannelSizeDefault = uint(2048)
-
 	// default time layout
 	defaultLayout = "2006/01/02 15:04:05"
+	// timestamp with zone info
+	timestampLayout = "2006-01-02T15:04:05.000+0800"
 )
 
 // LevelFlags level Flags set
@@ -226,7 +228,7 @@ func (l *Logger) Emergency(fmt string, args ...interface{}) {
 	l.deliverRecordToWriter(EMERGENCY, fmt, args...)
 }
 
-func (l *Logger) deliverRecordToWriter(level int, format string, args ...interface{}) {
+func (l *Logger) deliverRecordToWriter(level int, f string, args ...interface{}) {
 	var msg string
 	var fi bytes.Buffer
 
@@ -234,10 +236,22 @@ func (l *Logger) deliverRecordToWriter(level int, format string, args ...interfa
 		return
 	}
 
-	if format != "" {
-		msg = fmt.Sprintf(format, args...)
+	sz := len(args)
+	// prevent the err: call has arguments but no formatting directives
+	f = f
+	if f == "" && sz == 0 {
+		return
+	}
+
+	if strings.Contains(f, "%") {
+		msg = fmt.Sprintf(f, args...)
 	} else {
-		msg = fmt.Sprint(args...)
+		sz = len(args)
+		filledFmt := ""
+		for i := 0; i < sz; i++ {
+			filledFmt += "%v"
+		}
+		msg = f + fmt.Sprintf(filledFmt, args...)
 	}
 
 	// source code, file and line num
@@ -411,4 +425,13 @@ func Alert(fmt string, args ...interface{}) {
 // Emergency level emergency
 func Emergency(fmt string, args ...interface{}) {
 	loggerDefault.deliverRecordToWriter(EMERGENCY, fmt, args...)
+}
+
+func getLevelDefault(flag string, defaultFlag int) int {
+	for i, f := range LevelFlags {
+		if strings.TrimSpace(strings.ToUpper(flag)) == f {
+			return i
+		}
+	}
+	return defaultFlag
 }
