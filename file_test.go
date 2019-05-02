@@ -8,7 +8,7 @@ import (
 
 var deleteTempLogs = true
 
-func generateNewFileWriterWithOptions(level int, filename string) (*FileWriter, error) {
+func generateNewFileWriterWithOptions(level string, filename string) (*FileWriter, error) {
 	options := FileWriterOptions{
 		Level:    level,
 		Filename: filename,
@@ -52,7 +52,7 @@ func Test_NewFileWriterWithoutSuffixFilename(t *testing.T) {
 	loggerDefaultTest.SetLevel(DEBUG)
 
 	filename := "./test/xwi88-log4go%Y%M%D%H%m-withoutSuffixFilename"
-	w, err := generateNewFileWriterWithOptions(DEBUG, filename)
+	w, err := generateNewFileWriterWithOptions(LevelFlagDebug, filename)
 	if err != nil {
 		t.Error(err)
 	}
@@ -81,8 +81,8 @@ func Test_NewFileWriterWithErrorPattern(t *testing.T) {
 	loggerDefaultTest := newLoggerWithRecords(records)
 	defer loggerDefaultTest.Close()
 
-	filename := "./test/xwi88-log4go%YY%X-error-pattern.log"
-	w, err := generateNewFileWriterWithOptions(DEBUG, filename)
+	filename := "./test/xwi88-log4go%Y%X-error-pattern.log"
+	w, err := generateNewFileWriterWithOptions(LevelFlagDebug, filename)
 	if err != nil {
 		t.Log(err)
 	}
@@ -99,7 +99,7 @@ func Test_NewFileWriterWithNilLogger(t *testing.T) {
 	loggerDefaultTest := newLoggerWithRecords(records)
 
 	filename := "./test/xwi88-log4go%Y%M%D%H%m-nil.log"
-	w, err := generateNewFileWriterWithOptions(DEBUG, filename)
+	w, err := generateNewFileWriterWithOptions(LevelFlagDebug, filename)
 	if err != nil {
 		t.Error(err)
 	}
@@ -132,7 +132,7 @@ func Test_NewFileWriterWithLevel(t *testing.T) {
 	defer loggerDefaultTest.Close()
 
 	filename := "./test/xwi88-log4go%Y%M%D%H%m-level.log"
-	w, err := generateNewFileWriterWithOptions(INFO, filename)
+	w, err := generateNewFileWriterWithOptions(LevelFlagInfo, filename)
 	if err != nil {
 		t.Error(err)
 	}
@@ -170,7 +170,7 @@ func Test_NewFileWriterWithRotate(t *testing.T) {
 	defer loggerDefaultTest.Close()
 
 	filename := "./test/xwi88-log4go%Y%M%D%H%m-level.log"
-	w, err := generateNewFileWriterWithOptions(INFO, filename)
+	w, err := generateNewFileWriterWithOptions(LevelFlagInfo, filename)
 	if err != nil {
 		t.Error(err)
 	}
@@ -208,7 +208,7 @@ func Test_NewFileWriterWithLevel2(t *testing.T) {
 	defer loggerDefaultTest.Close()
 
 	filename := "./test/xwi88-log4go%Y%M%D%H%m-level2.log"
-	w, err := generateNewFileWriterWithOptions(INFO, filename)
+	w, err := generateNewFileWriterWithOptions(LevelFlagInfo, filename)
 	if err != nil {
 		t.Error(err)
 	}
@@ -237,7 +237,7 @@ func Test_NewFileWriterWithEmptyPath(t *testing.T) {
 	defer loggerDefaultTest.Close()
 
 	filename := ""
-	w, err := generateNewFileWriterWithOptions(DEBUG, filename)
+	w, err := generateNewFileWriterWithOptions(LevelFlagDebug, filename)
 	if err != nil {
 		t.Error(err)
 	}
@@ -261,7 +261,7 @@ func Test_NewFileWriterWithNilFileBufWriter(t *testing.T) {
 	defer loggerDefaultTest.Close()
 
 	filename := ""
-	w, err := generateNewFileWriterWithOptions(DEBUG, filename)
+	w, err := generateNewFileWriterWithOptions(LevelFlagDebug, filename)
 	if err != nil {
 		t.Error(err)
 	}
@@ -283,7 +283,7 @@ func Test_NewFileWriterWithFullColor(t *testing.T) {
 	defer loggerDefaultTest.Close()
 
 	filename := "./test/xwi88-log4go%Y%M%D%H%m-fullColor.log"
-	w, err := generateNewFileWriterWithOptions(DEBUG, filename)
+	w, err := generateNewFileWriterWithOptions(LevelFlagDebug, filename)
 	if err != nil {
 		t.Error(err)
 	}
@@ -313,7 +313,7 @@ func Test_NewFileWriterWithFullPath(t *testing.T) {
 
 	fullPath = true
 	filename := "./test/xwi88-log4go%Y%M%D%H%m-fullPath.log"
-	w, err := generateNewFileWriterWithOptions(DEBUG, filename)
+	w, err := generateNewFileWriterWithOptions(LevelFlagDebug, filename)
 	if err != nil {
 		t.Error(err)
 	}
@@ -342,7 +342,7 @@ func Test_NewFileWriterWithFuncName(t *testing.T) {
 
 	funcName = true
 	filename := "./test/xwi88-log4go%Y%M%D%H%m-funcName.log"
-	w, err := generateNewFileWriterWithOptions(DEBUG, filename)
+	w, err := generateNewFileWriterWithOptions(LevelFlagDebug, filename)
 	if err != nil {
 		t.Error(err)
 	}
@@ -372,7 +372,7 @@ func Test_NewFileWriterWithLayout(t *testing.T) {
 
 	layout = "20060102T150405.000-0700"
 	filename := "./test/xwi88-log4go%Y%M%D%H%m-layout.log"
-	w, err := generateNewFileWriterWithOptions(DEBUG, filename)
+	w, err := generateNewFileWriterWithOptions(LevelFlagDebug, filename)
 	if err != nil {
 		t.Error(err)
 	}
@@ -402,7 +402,7 @@ func Benchmark_NewFileWriter(b *testing.B) {
 	defer loggerDefaultTest.Close()
 
 	filename := "./test/xwi88-log4go%Y%M%D%H%m-benchmark.log"
-	w, err := generateNewFileWriterWithOptions(DEBUG, filename)
+	w, err := generateNewFileWriterWithOptions(LevelFlagDebug, filename)
 	if err != nil {
 		b.Error(err)
 	}

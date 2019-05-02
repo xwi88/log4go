@@ -2,7 +2,6 @@ package log4go
 
 import (
 	"fmt"
-	"math"
 	"os"
 )
 
@@ -77,9 +76,10 @@ type ConsoleWriter struct {
 
 // ConsoleWriterOptions color field options
 type ConsoleWriterOptions struct {
-	Level     int
-	Color     bool
-	FullColor bool
+	Level     string `json:"level"`
+	On        bool   `json:"on"`
+	Color     bool   `json:"color"`
+	FullColor bool   `json:"fullColor"`
 }
 
 // NewConsoleWriter create new console writer
@@ -88,16 +88,17 @@ func NewConsoleWriter() *ConsoleWriter {
 }
 
 // NewConsoleWriterWithOptions create new console writer with level
-func NewConsoleWriterWithOptions(option ConsoleWriterOptions) *ConsoleWriter {
+func NewConsoleWriterWithOptions(options ConsoleWriterOptions) *ConsoleWriter {
 	defaultLevel := DEBUG
 
-	if option.Level <= defaultLevel {
-		defaultLevel = int(math.Max(float64(option.Level), 0))
+	if len(options.Level) != 0 {
+		defaultLevel = getLevelDefault(options.Level, defaultLevel)
 	}
+
 	return &ConsoleWriter{
 		level:     defaultLevel,
-		color:     option.Color,
-		fullColor: option.FullColor,
+		color:     options.Color,
+		fullColor: options.FullColor,
 	}
 }
 

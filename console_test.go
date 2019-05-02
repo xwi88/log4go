@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func generateNewConsoleWriterWithOptions(level int, color, fullColor bool) *ConsoleWriter {
+func generateNewConsoleWriterWithOptions(level string, color, fullColor bool) *ConsoleWriter {
 	options := ConsoleWriterOptions{
 		Level:     level,
 		Color:     color,
@@ -42,7 +42,7 @@ func Test_NewConsoleWriterWithNilLogger(t *testing.T) {
 	records := make(chan *Record, uint(0))
 	close(records)
 	loggerDefaultTest := newLoggerWithRecords(records)
-	c := generateNewConsoleWriterWithOptions(DEBUG, color, fullColor)
+	c := generateNewConsoleWriterWithOptions(LevelFlagDebug, color, fullColor)
 	var name = "console nil logger"
 	defer func() {
 		if err := recover(); err != nil {
@@ -70,7 +70,7 @@ func Test_NewConsoleWriterWithGlobalSet(t *testing.T) {
 	SetLevel(INFO)
 	WithFullPath(true)
 	WithFuncName(true)
-	c := generateNewConsoleWriterWithOptions(INFO, color, fullColor)
+	c := generateNewConsoleWriterWithOptions(LevelFlagInfo, color, fullColor)
 	Register(c)
 
 	var name = "console with default global"
@@ -94,7 +94,7 @@ func Test_NewConsoleWriterWithLevel(t *testing.T) {
 	loggerDefaultTest.SetLevel(DEBUG)
 	defer loggerDefaultTest.Close()
 
-	c := generateNewConsoleWriterWithOptions(INFO, color, fullColor)
+	c := generateNewConsoleWriterWithOptions(LevelFlagInfo, color, fullColor)
 	var name = "console level"
 	generateRegisterConsoleWriter(loggerDefaultTest, c, fullPath, funcName, layout)
 	loggerDefaultTest.Debug("log4go by %s", name)
@@ -118,7 +118,7 @@ func Test_NewConsoleWriterWithLevel2(t *testing.T) {
 	loggerDefaultTest.SetLevel(NOTICE)
 	defer loggerDefaultTest.Close()
 
-	c := generateNewConsoleWriterWithOptions(DEBUG, color, fullColor)
+	c := generateNewConsoleWriterWithOptions(LevelFlagDebug, color, fullColor)
 	var name = "console level2"
 	generateRegisterConsoleWriter(loggerDefaultTest, c, fullPath, funcName, layout)
 	loggerDefaultTest.Debug("log4go by %s", name)
@@ -142,7 +142,7 @@ func Test_NewConsoleWriterWithColor(t *testing.T) {
 	defer loggerDefaultTest.Close()
 
 	color = true
-	c := generateNewConsoleWriterWithOptions(DEBUG, color, fullColor)
+	c := generateNewConsoleWriterWithOptions(LevelFlagDebug, color, fullColor)
 	var name = "console color"
 	generateRegisterConsoleWriter(loggerDefaultTest, c, fullPath, funcName, layout)
 	loggerDefaultTest.Debug("log4go by %s", name)
@@ -166,7 +166,7 @@ func Test_NewConsoleWriterWithFullColor(t *testing.T) {
 
 	color = true
 	fullColor = true
-	c := generateNewConsoleWriterWithOptions(DEBUG, color, fullColor)
+	c := generateNewConsoleWriterWithOptions(LevelFlagDebug, color, fullColor)
 	var name = "console full color"
 	generateRegisterConsoleWriter(loggerDefaultTest, c, fullPath, funcName, layout)
 	loggerDefaultTest.Debug("log4go by %s", name)
@@ -190,7 +190,7 @@ func Test_NewConsoleWriterWithFullPath(t *testing.T) {
 
 	color = true
 	fullPath = true
-	c := generateNewConsoleWriterWithOptions(DEBUG, color, fullColor)
+	c := generateNewConsoleWriterWithOptions(LevelFlagDebug, color, fullColor)
 	var name = "console full path"
 	generateRegisterConsoleWriter(loggerDefaultTest, c, fullPath, funcName, layout)
 	loggerDefaultTest.Debug("log4go by %s", name)
@@ -214,7 +214,7 @@ func Test_NewConsoleWriterWithFuncName(t *testing.T) {
 
 	color = true
 	funcName = true
-	c := generateNewConsoleWriterWithOptions(DEBUG, color, fullColor)
+	c := generateNewConsoleWriterWithOptions(LevelFlagDebug, color, fullColor)
 	var name = "console func name"
 	generateRegisterConsoleWriter(loggerDefaultTest, c, fullPath, funcName, layout)
 	loggerDefaultTest.Debug("log4go by %s", name)
@@ -238,7 +238,7 @@ func Test_NewConsoleWriterWithLayout(t *testing.T) {
 
 	color = true
 	layout = "20060102T150405.000-0700"
-	c := generateNewConsoleWriterWithOptions(DEBUG, color, fullColor)
+	c := generateNewConsoleWriterWithOptions(LevelFlagDebug, color, fullColor)
 	var name = "console layout"
 	generateRegisterConsoleWriter(loggerDefaultTest, c, fullPath, funcName, layout)
 	loggerDefaultTest.Debug("log4go by %s", name)
@@ -261,7 +261,7 @@ func Benchmark_NewConsoleWriter(b *testing.B) {
 	loggerDefaultTest.SetLevel(DEBUG)
 	defer loggerDefaultTest.Close()
 
-	c := generateNewConsoleWriterWithOptions(DEBUG, color, fullColor)
+	c := generateNewConsoleWriterWithOptions(LevelFlagDebug, color, fullColor)
 	var name = "console benchmark test"
 	generateRegisterConsoleWriter(loggerDefaultTest, c, fullPath, funcName, layout)
 	loggerDefaultTest.Debug("log4go by %s", name)
@@ -289,7 +289,7 @@ func Benchmark_NewConsoleWriterAll(b *testing.B) {
 	funcName = true
 	layout = "2006-01-02 15:04:05"
 
-	c := generateNewConsoleWriterWithOptions(DEBUG, color, fullColor)
+	c := generateNewConsoleWriterWithOptions(LevelFlagDebug, color, fullColor)
 	var name = "console benchmark test"
 	generateRegisterConsoleWriter(loggerDefaultTest, c, fullPath, funcName, layout)
 	loggerDefaultTest.Debug("log4go by %s", name)

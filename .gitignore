@@ -32,3 +32,6 @@ debug
 *.pdf
 *.svg
 *.txt
+test/
+data/
+tmp/
