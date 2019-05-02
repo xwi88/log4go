@@ -11,16 +11,16 @@ import (
 	"time"
 )
 
-// LevelFlags log level flags
+// LevelFlag log level flags
 const (
-	LevelFlagsEmergency     = "EMERGENCY"
-	LevelFlagsAlert         = "ALERT"
-	LevelFlagsCritical      = "CRITICAL"
-	LevelFlagsError         = "ERROR"
-	LevelFlagsWarning       = "WARNING"
-	LevelFlagsNotice        = "NOTICE"
-	LevelFlagsInformational = "INFO"
-	LevelFlagsDebug         = "DEBUG"
+	LevelFlagEmergency = "EMERGENCY"
+	LevelFlagAlert     = "ALERT"
+	LevelFlagCritical  = "CRITICAL"
+	LevelFlagError     = "ERROR"
+	LevelFlagWarning   = "WARNING"
+	LevelFlagNotice    = "NOTICE"
+	LevelFlagInfo      = "INFO"
+	LevelFlagDebug     = "DEBUG"
 )
 
 // RFC5424 log message levels.
@@ -48,14 +48,14 @@ const (
 // LevelFlags level Flags set
 var (
 	LevelFlags = []string{
-		LevelFlagsEmergency,
-		LevelFlagsAlert,
-		LevelFlagsCritical,
-		LevelFlagsError,
-		LevelFlagsWarning,
-		LevelFlagsNotice,
-		LevelFlagsInformational,
-		LevelFlagsDebug,
+		LevelFlagEmergency,
+		LevelFlagAlert,
+		LevelFlagCritical,
+		LevelFlagError,
+		LevelFlagWarning,
+		LevelFlagNotice,
+		LevelFlagInfo,
+		LevelFlagDebug,
 	}
 	DefaultLayout = defaultLayout
 )

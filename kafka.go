@@ -12,7 +12,7 @@ import (
 
 // KafKaMSGFields kafka msg fields
 type KafKaMSGFields struct {
-	Level     string // dynamic, set by logger
+	Level     string // dynamic, set by logger, mark the record level
 	File      string `json:"file"`      // source code file:line_number
 	Message   string `json:"message"`   // required, dynamic
 	ServerIP  string `json:"serverIp"`  // required, init field, set by app
@@ -38,7 +38,7 @@ type KafKaWriterOptions struct {
 	ProducerTimeout         time.Duration `json:"producerTimeout"`
 	Brokers                 []string      `json:"brokers"`
 
-	MSG KafKaMSGFields
+	MSG KafKaMSGFields `json:"msg"`
 }
 
 // KafKaWriter kafka writer
@@ -46,7 +46,7 @@ type KafKaWriter struct {
 	level    int
 	producer sarama.SyncProducer
 	messages chan *sarama.ProducerMessage
-	options  *KafKaWriterOptions
+	options  KafKaWriterOptions
 
 	run  bool // avoid the block with no running kafka writer
 	quit chan struct{}
@@ -54,11 +54,12 @@ type KafKaWriter struct {
 }
 
 // NewKafKaWriter new kafka writer
-func NewKafKaWriter(options *KafKaWriterOptions) *KafKaWriter {
+func NewKafKaWriter(options KafKaWriterOptions) *KafKaWriter {
 	defaultLevel := DEBUG
-	if options.Level != "" {
+	if len(options.Level) != 0 {
 		defaultLevel = getLevelDefault(options.Level, defaultLevel)
 	}
+
 	if options.Debug {
 		log.SetOutput(os.Stdout)
 	} else {
@@ -105,8 +106,9 @@ func (k *KafKaWriter) Write(r *Record) error {
 	var structData map[string]interface{}
 	err = json.Unmarshal(byteData, &structData)
 	if err != nil {
-		delete(structData, "extraFields")
+		log.Printf("[log4go] kafka writer err: %v", err.Error())
 	}
+	delete(structData, "extraFields")
 
 	// not exist new fields will be added
 	for k, v := range data.ExtraFields {
@@ -114,12 +116,12 @@ func (k *KafKaWriter) Write(r *Record) error {
 			structData[k] = v
 		}
 	}
-	jsonStructDataByte, err := json.Marshal(structData)
+	structDataByte, err := json.Marshal(structData)
 	if err != nil {
 		return err
 	}
 
-	jsonData := string(jsonStructDataByte)
+	jsonData := string(structDataByte)
 
 	key := ""
 	if k.options.Key != "" {

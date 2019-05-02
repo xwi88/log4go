@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"math"
+	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -73,21 +73,23 @@ type FileWriter struct {
 
 // FileWriterOptions file writer options
 type FileWriterOptions struct {
-	Level    int
-	Filename string
+	Level    string `json:"level"`
+	On       bool   `json:"on"`
+	Filename string `json:"filename"`
 
-	Rotate bool
+	Rotate bool `json:"rotate"`
+
 	// Rotate daily
-	Daily   bool
-	MaxDays int
+	Daily   bool `json:"daily"`
+	MaxDays int  `json:"maxDays"`
 
 	// Rotate hourly
-	Hourly   bool
-	MaxHours int
+	Hourly   bool `json:"hourly"`
+	MaxHours int  `json:"maxHours"`
 
 	// Rotate minutely
-	Minutely   bool
-	MaxMinutes int
+	Minutely   bool `json:"minutely"`
+	MaxMinutes int  `json:"maxMinutes"`
 }
 
 // NewFileWriter create new file writer
@@ -96,23 +98,26 @@ func NewFileWriter() *FileWriter {
 }
 
 // NewFileWriterWithOptions create new file writer with options
-func NewFileWriterWithOptions(option FileWriterOptions) *FileWriter {
+func NewFileWriterWithOptions(options FileWriterOptions) *FileWriter {
 	defaultLevel := DEBUG
-	if option.Level <= defaultLevel {
-		defaultLevel = int(math.Max(float64(option.Level), 0))
+	if len(options.Level) != 0 {
+		defaultLevel = getLevelDefault(options.Level, defaultLevel)
 	}
-
-	return &FileWriter{
+	fileWriter := &FileWriter{
 		level:      defaultLevel,
-		filename:   option.Filename,
-		rotate:     option.Rotate,
-		daily:      option.Daily,
-		maxDays:    option.MaxDays,
-		hourly:     option.Hourly,
-		maxHours:   option.MaxHours,
-		minutely:   option.Minutely,
-		maxMinutes: option.MaxMinutes,
+		filename:   options.Filename,
+		rotate:     options.Rotate,
+		daily:      options.Daily,
+		maxDays:    options.MaxDays,
+		hourly:     options.Hourly,
+		maxHours:   options.MaxHours,
+		minutely:   options.Minutely,
+		maxMinutes: options.MaxMinutes,
 	}
+	if err := fileWriter.SetPathPattern(options.Filename); err != nil {
+		log.Printf("[log4go] file writer init err: %v", err.Error())
+	}
+	return fileWriter
 }
 
 // Write file write
@@ -121,7 +126,7 @@ func (w *FileWriter) Write(r *Record) error {
 		return nil
 	}
 	if w.fileBufWriter == nil {
-		return errors.New("FileWriter no opened file")
+		return errors.New("fileWriter no opened file")
 	}
 	_, err := w.fileBufWriter.WriteString(r.String())
 	return err
@@ -130,7 +135,7 @@ func (w *FileWriter) Write(r *Record) error {
 // Init file writer init
 func (w *FileWriter) Init() error {
 	filename := w.filename
-	defaultPerm := "0644"
+	defaultPerm := "0755"
 	if len(filename) != 0 {
 		w.suffix = filepath.Ext(filename)
 		w.filenameOnly = strings.TrimSuffix(filename, w.suffix)
@@ -151,10 +156,10 @@ func (w *FileWriter) Init() error {
 
 	if w.rotate {
 		if w.daily && w.maxDays <= 0 {
-			w.maxDays = 1
+			w.maxDays = 60
 		}
 		if w.hourly && w.maxHours <= 0 {
-			w.maxHours = 1
+			w.maxHours = 12
 		}
 		if w.minutely && w.maxMinutes <= 0 {
 			w.maxMinutes = 1
@@ -195,7 +200,7 @@ func (w *FileWriter) SetPathPattern(pattern string) error {
 		if variable == 1 {
 			act, ok := pathVariableTable[c]
 			if !ok {
-				return errors.New("Invalid rotate pattern (" + pattern + ")")
+				return errors.New("invalid rotate pattern (" + pattern + ")")
 			}
 			w.actions = append(w.actions, act)
 			variable = 0
@@ -222,7 +227,6 @@ func (w *FileWriter) Rotate() error {
 	now := time.Now()
 	v := 0
 	rotate := false
-
 	for i, act := range w.actions {
 		v = act(&now)
 		if v != w.variables[i] {
@@ -266,11 +270,10 @@ func (w *FileWriter) Rotate() error {
 			}
 		}
 	}
-
+	// must init file first!
 	if rotate == false {
 		return nil
 	}
-
 	w.initFileOnce.Do(w.initFile)
 	w.lastWriteTime = now
 
@@ -301,7 +304,7 @@ func (w *FileWriter) Rotate() error {
 	}
 
 	if w.fileBufWriter = bufio.NewWriterSize(w.file, 8192); w.fileBufWriter == nil {
-		return errors.New("Filewriter new fileBufWriter failed")
+		return errors.New("fileWriter new fileBufWriter failed")
 	}
 	w.suffix = filepath.Ext(filePath)
 	w.filenameOnly = strings.TrimSuffix(filePath, w.suffix)
