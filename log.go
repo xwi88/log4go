@@ -236,23 +236,15 @@ func (l *Logger) deliverRecordToWriter(level int, f string, args ...interface{})
 		return
 	}
 
+	msg = f
 	sz := len(args)
-	// prevent the err: call has arguments but no formatting directives
-	f = f
-	if f == "" && sz == 0 {
-		return
-	}
-
-	if strings.Contains(f, "%") {
-		msg = fmt.Sprintf(f, args...)
-	} else {
-		sz = len(args)
-		filledFmt := ""
-		for i := 0; i < sz; i++ {
-			filledFmt += "%v"
+	if sz != 0 {
+		if strings.Contains(msg, "%") && !strings.Contains(msg, "%%") {
+		} else {
+			msg += strings.Repeat("%v", len(args))
 		}
-		msg = f + fmt.Sprintf(filledFmt, args...)
 	}
+	msg = fmt.Sprintf(msg, args...)
 
 	// source code, file and line num
 	pc, file, line, ok := runtime.Caller(2)

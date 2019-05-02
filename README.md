@@ -8,7 +8,6 @@ all-powerful log for go with go module support
 - [x] console writer
 - [x] file writer
 - [ ] kafka writer
-- [ ] elasticsearch writer
 - [ ] net writer
 
 ## ENV
