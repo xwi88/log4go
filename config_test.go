@@ -8,21 +8,21 @@ import (
 var (
 	logConfig = `{
   "level": "info",
-  "fullPath": true,
+  "full_path": true,
 	
-  "file": {
+  "file_writer": {
     "level": "warn",
     "filename": "./test/log4go-test-%Y%M%D.log",
 	"enable": true
   },
 
-  "console": {
+  "console_writer": {
     "level": "error",
     "enable": true,
     "color": true
   },
 	
-  "kafka": {
+  "kafka_writer": {
     "level": "ERROR",
     "enable": false,
     "buffer_size": 10,

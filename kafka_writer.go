@@ -16,7 +16,7 @@ type KafKaMSGFields struct {
 	Level     string `json:"level"`                            // dynamic, set by logger, mark the record level
 	File      string `json:"file"`                             // source code file:line_number
 	Message   string `json:"message"`                          // required, dynamic
-	ServerIP  string `json:"serverIp"`                         // required, init field, set by app
+	ServerIP  string `json:"server_ip"`                        // required, init field, set by app
 	Timestamp string `json:"timestamp"`                        // required, dynamic, set by logger
 	Now       int64  `json:"now"`                              // choice
 
