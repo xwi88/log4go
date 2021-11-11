@@ -19,15 +19,28 @@ func newBrush(color string) brush {
 	}
 }
 
+// effect: 0~8
+// 0:no, 1: Highlight (deepen) display, 2: Low light (dimmed) display,
+// 4: underline, 5: blink, 7: Reverse display (replace background color and font color)
+// 8: blank
+
+// font color: 30~39
+// 30: black, 31: red, 32: green, 33: yellow, 34: blue, 35: purple, 36: dark green, 37: grey
+// 38: Sets the underline on the default foreground color, 39: Turn off underlining on the default foreground color
+
+// background color: 40~49
+// 40: black, 41: red, 42: green, 43: yellow, 44: blue, 45: purple, 46: dark green, 47: grey
+
+// (background;font;effect)
 var colors = []brush{
-	newBrush("1;37"), // Emergency          white
-	newBrush("1;36"), // Alert              cyan
-	newBrush("1;35"), // Critical           magenta
+	newBrush("1;31"), // Emergency          red
+	newBrush("1;36"), // Alert              dark green
+	newBrush("1;35"), // Critical           purple
 	newBrush("1;31"), // Error              red
 	newBrush("1;33"), // Warning            yellow
 	newBrush("1;32"), // Notice             green
 	newBrush("1;34"), // Informational      blue
-	newBrush("1;44"), // Debug              Background blue
+	newBrush("2;37"), // Debug              grey
 }
 
 func (r *colorRecord) ColorString() string {
@@ -39,7 +52,7 @@ func (r *colorRecord) String() string {
 	inf := ""
 	switch r.level {
 	case EMERGENCY:
-		inf = fmt.Sprintf("\033[36m%s\033[0m [\033[37m%s\033[0m] \033[47;30m%s\033[0m %s\n",
+		inf = fmt.Sprintf("\033[36m%s\033[0m [\033[31m%s\033[0m] \033[47;30m%s\033[0m %s\n",
 			r.time, LevelFlags[r.level], r.file, r.msg)
 	case ALERT:
 		inf = fmt.Sprintf("\033[36m%s\033[0m [\033[36m%s\033[0m] \033[47;30m%s\033[0m %s\n",
@@ -76,10 +89,10 @@ type ConsoleWriter struct {
 
 // ConsoleWriterOptions color field options
 type ConsoleWriterOptions struct {
-	Level     string `json:"level"`
-	On        bool   `json:"on"`
-	Color     bool   `json:"color"`
-	FullColor bool   `json:"fullColor"`
+	Level     string `json:"level" mapstructure:"level"`
+	Enable    bool   `json:"enable" mapstructure:"enable"`
+	Color     bool   `json:"color" mapstructure:"color"`
+	FullColor bool   `json:"full_color" mapstructure:"full_color"`
 }
 
 // NewConsoleWriter create new console writer
@@ -92,7 +105,7 @@ func NewConsoleWriterWithOptions(options ConsoleWriterOptions) *ConsoleWriter {
 	defaultLevel := DEBUG
 
 	if len(options.Level) != 0 {
-		defaultLevel = getLevelDefault(options.Level, defaultLevel)
+		defaultLevel = getLevelDefault(options.Level, defaultLevel, "")
 	}
 
 	return &ConsoleWriter{
@@ -109,12 +122,12 @@ func (w *ConsoleWriter) Write(r *Record) error {
 	}
 	if w.color {
 		if w.fullColor {
-			fmt.Fprint(os.Stdout, ((*colorRecord)(r)).ColorString())
+			_, _ = fmt.Fprint(os.Stdout, ((*colorRecord)(r)).ColorString())
 		} else {
-			fmt.Fprint(os.Stdout, ((*colorRecord)(r)).String())
+			_, _ = fmt.Fprint(os.Stdout, ((*colorRecord)(r)).String())
 		}
 	} else {
-		fmt.Fprint(os.Stdout, r.String())
+		_, _ = fmt.Fprint(os.Stdout, r.String())
 	}
 	return nil
 }

@@ -35,3 +35,4 @@ debug
 test/
 data/
 tmp/
+vendor/

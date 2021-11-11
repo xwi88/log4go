@@ -17,7 +17,7 @@ const (
 	LevelFlagAlert     = "ALERT"
 	LevelFlagCritical  = "CRITICAL"
 	LevelFlagError     = "ERROR"
-	LevelFlagWarning   = "WARNING"
+	LevelFlagWarning   = "WARN"
 	LevelFlagNotice    = "NOTICE"
 	LevelFlagInfo      = "INFO"
 	LevelFlagDebug     = "DEBUG"
@@ -38,7 +38,7 @@ const (
 
 const (
 	// default size or min size for record channel
-	recordChannelSizeDefault = uint(2048)
+	recordChannelSizeDefault = uint(4096)
 	// default time layout
 	defaultLayout = "2006/01/02 15:04:05"
 	// timestamp with zone info
@@ -60,7 +60,7 @@ var (
 	DefaultLayout = defaultLayout
 )
 
-// default looger
+// default logger
 var (
 	loggerDefault     *Logger
 	recordPool        *sync.Pool
@@ -85,7 +85,7 @@ type Writer interface {
 	Write(*Record) error
 }
 
-//Flusher record flusher
+// Flusher record flusher
 type Flusher interface {
 	Flush() error
 }
@@ -139,7 +139,7 @@ func newLoggerWithRecords(records chan *Record) *Logger {
 	l.level = DEBUG
 	l.layout = DefaultLayout
 
-	go boostrapLogWriter(l)
+	go bootstrapLogWriter(l)
 
 	return l
 }
@@ -281,7 +281,7 @@ func (l *Logger) deliverRecordToWriter(level int, f string, args ...interface{})
 	l.records <- r
 }
 
-func boostrapLogWriter(logger *Logger) {
+func bootstrapLogWriter(logger *Logger) {
 	var (
 		r  *Record
 		ok bool
@@ -419,11 +419,13 @@ func Emergency(fmt string, args ...interface{}) {
 	loggerDefault.deliverRecordToWriter(EMERGENCY, fmt, args...)
 }
 
-func getLevelDefault(flag string, defaultFlag int) int {
+// The method is put here, so it's easy to test
+func getLevelDefault(flag string, defaultFlag int, writer string) int {
 	for i, f := range LevelFlags {
 		if strings.TrimSpace(strings.ToUpper(flag)) == f {
 			return i
 		}
 	}
+	log.Printf("[log4go] tip, no match level for writer(%v) with flag(%v), use default level: %d, flag: %v\n", writer, flag, defaultFlag, LevelFlags[defaultFlag])
 	return defaultFlag
 }

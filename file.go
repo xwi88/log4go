@@ -73,23 +73,23 @@ type FileWriter struct {
 
 // FileWriterOptions file writer options
 type FileWriterOptions struct {
-	Level    string `json:"level"`
-	On       bool   `json:"on"`
-	Filename string `json:"filename"`
+	Level    string `json:"level" mapstructure:"level"`
+	Enable   bool   `json:"enable" mapstructure:"enable"`
+	Filename string `json:"filename" mapstructure:"filename"`
 
-	Rotate bool `json:"rotate"`
+	Rotate bool `json:"rotate" mapstructure:"rotate"`
 
 	// Rotate daily
-	Daily   bool `json:"daily"`
-	MaxDays int  `json:"maxDays"`
+	Daily   bool `json:"daily" mapstructure:"daily"`
+	MaxDays int  `json:"max_days" mapstructure:"max_days"`
 
 	// Rotate hourly
-	Hourly   bool `json:"hourly"`
-	MaxHours int  `json:"maxHours"`
+	Hourly   bool `json:"hourly" mapstructure:"hourly"`
+	MaxHours int  `json:"max_hours" mapstructure:"max_hours"`
 
 	// Rotate minutely
-	Minutely   bool `json:"minutely"`
-	MaxMinutes int  `json:"maxMinutes"`
+	Minutely   bool `json:"minutely" mapstructure:"minutely"`
+	MaxMinutes int  `json:"max_minutes" mapstructure:"max_minutes"`
 }
 
 // NewFileWriter create new file writer
@@ -101,7 +101,7 @@ func NewFileWriter() *FileWriter {
 func NewFileWriterWithOptions(options FileWriterOptions) *FileWriter {
 	defaultLevel := DEBUG
 	if len(options.Level) != 0 {
-		defaultLevel = getLevelDefault(options.Level, defaultLevel)
+		defaultLevel = getLevelDefault(options.Level, defaultLevel, "")
 	}
 	fileWriter := &FileWriter{
 		level:      defaultLevel,

@@ -29,7 +29,7 @@ func generateRegisterConsoleWriter(lg *Logger, w *ConsoleWriter, fullPath, funcN
 
 func Test_NewConsoleWriterWithStruct(t *testing.T) {
 	c := &ConsoleWriter{}
-	t.Log(c)
+	t.Logf("%#v", c)
 }
 
 func Test_NewConsoleWriter(t *testing.T) {
@@ -167,6 +167,7 @@ func Test_NewConsoleWriterWithFullColor(t *testing.T) {
 	color = true
 	fullColor = true
 	c := generateNewConsoleWriterWithOptions(LevelFlagDebug, color, fullColor)
+	// c := generateNewConsoleWriterWithOptions(LevelFlagEmergency, color, fullColor)
 	var name = "console full color"
 	generateRegisterConsoleWriter(loggerDefaultTest, c, fullPath, funcName, layout)
 	loggerDefaultTest.Debug("log4go by %s", name)
