@@ -12,31 +12,32 @@ import (
 
 // KafKaMSGFields kafka msg fields
 type KafKaMSGFields struct {
-	Level     string // dynamic, set by logger, mark the record level
-	File      string `json:"file"`      // source code file:line_number
-	Message   string `json:"message"`   // required, dynamic
-	ServerIP  string `json:"serverIp"`  // required, init field, set by app
-	Timestamp string `json:"timestamp"` // required, dynamic, set by logger
-	Now       int64  `json:"now"`       // choice
+	ESIndex   string `json:"es_index" mapstructure:"es_index"` // optional, init field, can set if want send data to es
+	Level     string `json:"level"`                            // dynamic, set by logger, mark the record level
+	File      string `json:"file"`                             // source code file:line_number
+	Message   string `json:"message"`                          // required, dynamic
+	ServerIP  string `json:"server_ip"`                        // required, init field, set by app
+	Timestamp string `json:"timestamp"`                        // required, dynamic, set by logger
+	Now       int64  `json:"now"`                              // choice
 
-	ExtraFields map[string]interface{} `json:"extraFields"` // extra fields will be added
+	ExtraFields map[string]interface{} `json:"extra_fields" mapstructure:"extra_fields"` // extra fields will be added
 }
 
 // KafKaWriterOptions kafka writer options
 type KafKaWriterOptions struct {
-	Level          string `json:"level"`
-	On             bool   `json:"on"`
-	BufferSize     int    `json:"bufferSize"`
-	Debug          bool   `json:"debug"`          // if true, will output the send msg
-	SpecifyVersion bool   `json:"specifyVersion"` // if use the input version, default false
-	VersionStr     string `json:"version"`        // used to specify the kafka version, ex: 0.10.0.1 or 1.1.1
+	Level          string `json:"level" mapstructure:"level"`
+	Enable         bool   `json:"enable" mapstructure:"enable"`
+	BufferSize     int    `json:"buffer_size" mapstructure:"buffer_size"`
+	Debug          bool   `json:"debug" mapstructure:"debug"`                     // if true, will output the send msg
+	SpecifyVersion bool   `json:"specify_version" mapstructure:"specify_version"` // if use the input version, default false
+	VersionStr     string `json:"version" mapstructure:"version"`                 // used to specify the kafka version, ex: 0.10.0.1 or 1.1.1
 
-	Key string `json:"key"` // kafka producer key, choice field
+	Key string `json:"key" mapstructure:"key"` // kafka producer key, choice field
 
-	ProducerTopic           string        `json:"producerTopic"`
-	ProducerReturnSuccesses bool          `json:"producerReturnSuccesses"`
-	ProducerTimeout         time.Duration `json:"producerTimeout"`
-	Brokers                 []string      `json:"brokers"`
+	ProducerTopic           string        `json:"producer_topic" mapstructure:"producer_topic"`
+	ProducerReturnSuccesses bool          `json:"producer_return_successes" mapstructure:"producer_return_successes"`
+	ProducerTimeout         time.Duration `json:"producer_timeout" mapstructure:"producer_timeout"`
+	Brokers                 []string      `json:"brokers" mapstructure:"brokers"`
 
 	MSG KafKaMSGFields `json:"msg"`
 }
@@ -57,7 +58,7 @@ type KafKaWriter struct {
 func NewKafKaWriter(options KafKaWriterOptions) *KafKaWriter {
 	defaultLevel := DEBUG
 	if len(options.Level) != 0 {
-		defaultLevel = getLevelDefault(options.Level, defaultLevel)
+		defaultLevel = getLevelDefault(options.Level, defaultLevel, "")
 	}
 
 	if options.Debug {
@@ -218,7 +219,7 @@ func (k *KafKaWriter) Start() (err error) {
 	}
 	size := k.options.BufferSize
 	if size <= 1 {
-		size = 100
+		size = 1024
 	}
 	k.messages = make(chan *sarama.ProducerMessage, size)
 

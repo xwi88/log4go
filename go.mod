@@ -1,3 +1,5 @@
 module github.com/xwi88/log4go
 
-require github.com/Shopify/sarama v1.22.0
+go 1.16
+
+require github.com/Shopify/sarama v1.30.0

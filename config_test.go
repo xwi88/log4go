@@ -8,34 +8,34 @@ import (
 var (
 	logConfig = `{
   "level": "info",
-  "fullPath": true,
+  "full_path": true,
 	
-  "file": {
-    "level": "debug",
+  "file_writer": {
+    "level": "warn",
     "filename": "./test/log4go-test-%Y%M%D.log",
-    "on": true
+	"enable": true
   },
 
-  "console": {
+  "console_writer": {
     "level": "error",
-    "on": true,
+    "enable": true,
     "color": true
   },
 	
-  "kafka": {
+  "kafka_writer": {
     "level": "ERROR",
-    "on": true,
-    "bufferSize": 10,
+    "enable": false,
+    "buffer_size": 10,
     "debug": true,
 	"msg": {
-		"serverIp": "127.0.0.1"
+		"server_ip": "127.0.0.1"
 	},
-    "specifyVersion":true,
+    "specify_version":true,
     "version":"0.10.0.1",
     "key": "kafka-test",
-    "producerTopic": "log4go-kafka-test",
-    "producerReturnSuccesses": true,
-    "producerTimeout": 1,
+    "producer_topic": "log4go-kafka-test",
+    "producer_return_successes": true,
+    "producer_timeout": 1,
     "brokers": ["47.94.201.80:9092"]
   }
 }
