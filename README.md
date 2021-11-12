@@ -1,6 +1,6 @@
 # log4go
 
-all-powerful log for go with go module support
+The simple but powerful log for go.
 
 ## TODO
 
@@ -12,10 +12,19 @@ all-powerful log for go with go module support
 
 ## ENV
 
-should better use with go, the version >= `1.16`
+The go version shall >= `1.16`
 
-## Format
+## Writers
 
-### File
+- support output the caller`s file and lines
+- support level filter
+- simply use, pls ref `xxx_test.go`
 
->filename regex support: `%Y` `%M` `%D` `%H` `%m`, prefix must be `%`
+### FileWriter
+
+>Filename regex support: `%Y` `%M` `%D` `%H` `%m`, prefix must be `%`
+
+### KafkaWriter
+
+>Can writer to kafka easily, with `es_index` you can also transfer data to ES easily. If you want more fields can set
+> them by the field `msg.extra_fields`.
