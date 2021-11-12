@@ -12,4 +12,4 @@ all-powerful log for go with go module support
 
 ## ENV
 
-should better use with go version >= `1.11.2`
+should better use with go, the version >= `1.16`
