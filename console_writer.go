@@ -104,7 +104,7 @@ func NewConsoleWriter() *ConsoleWriter {
 func NewConsoleWriterWithOptions(options ConsoleWriterOptions) *ConsoleWriter {
 	defaultLevel := DEBUG
 
-	if len(options.Level) != 0 {
+	if len(options.Level) != defaultLevel {
 		defaultLevel = getLevelDefault(options.Level, defaultLevel, "")
 	}
 

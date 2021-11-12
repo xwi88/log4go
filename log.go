@@ -422,9 +422,11 @@ func Emergency(fmt string, args ...interface{}) {
 
 // The method is put here, so it's easy to test
 func getLevelDefault(flag string, defaultFlag int, writer string) int {
+	// level WARN == WARNING
 	if strings.EqualFold(flag, LevelFlagWarn) {
 		flag = LevelFlagWarning
 	}
+
 	for i, f := range LevelFlags {
 		if strings.TrimSpace(strings.ToUpper(flag)) == f {
 			return i
