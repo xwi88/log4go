@@ -17,7 +17,8 @@ const (
 	LevelFlagAlert     = "ALERT"
 	LevelFlagCritical  = "CRITICAL"
 	LevelFlagError     = "ERROR"
-	LevelFlagWarning   = "WARN"
+	LevelFlagWarning   = "WARNING" // compatible WARN
+	LevelFlagWarn      = "WARN"
 	LevelFlagNotice    = "NOTICE"
 	LevelFlagInfo      = "INFO"
 	LevelFlagDebug     = "DEBUG"
@@ -421,11 +422,14 @@ func Emergency(fmt string, args ...interface{}) {
 
 // The method is put here, so it's easy to test
 func getLevelDefault(flag string, defaultFlag int, writer string) int {
+	if strings.EqualFold(flag, LevelFlagWarn) {
+		flag = LevelFlagWarning
+	}
 	for i, f := range LevelFlags {
 		if strings.TrimSpace(strings.ToUpper(flag)) == f {
 			return i
 		}
 	}
-	log.Printf("[log4go] tip, no match level for writer(%v) with flag(%v), use default level: %d, flag: %v\n", writer, flag, defaultFlag, LevelFlags[defaultFlag])
+	log.Printf("[log4go] no matching level for writer(%v, flag:%v), use default level(%d, flag:%v)", writer, flag, defaultFlag, LevelFlags[defaultFlag])
 	return defaultFlag
 }

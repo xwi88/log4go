@@ -100,7 +100,7 @@ func NewFileWriter() *FileWriter {
 // NewFileWriterWithOptions create new file writer with options
 func NewFileWriterWithOptions(options FileWriterOptions) *FileWriter {
 	defaultLevel := DEBUG
-	if len(options.Level) != 0 {
+	if len(options.Level) != DEBUG {
 		defaultLevel = getLevelDefault(options.Level, defaultLevel, "")
 	}
 	fileWriter := &FileWriter{
@@ -126,7 +126,7 @@ func (w *FileWriter) Write(r *Record) error {
 		return nil
 	}
 	if w.fileBufWriter == nil {
-		return errors.New("fileWriter no opened file")
+		return errors.New("fileWriter no opened file: " + w.filename)
 	}
 	_, err := w.fileBufWriter.WriteString(r.String())
 	return err

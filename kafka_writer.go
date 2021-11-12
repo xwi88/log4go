@@ -2,9 +2,7 @@ package log4go
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
-	"os"
 	"time"
 
 	"github.com/Shopify/sarama"
@@ -59,12 +57,6 @@ func NewKafKaWriter(options KafKaWriterOptions) *KafKaWriter {
 	defaultLevel := DEBUG
 	if len(options.Level) != 0 {
 		defaultLevel = getLevelDefault(options.Level, defaultLevel, "")
-	}
-
-	if options.Debug {
-		log.SetOutput(os.Stdout)
-	} else {
-		log.SetOutput(ioutil.Discard)
 	}
 
 	return &KafKaWriter{
@@ -183,7 +175,7 @@ next:
 
 // Start start the kafka writer
 func (k *KafKaWriter) Start() (err error) {
-	log.Printf("[log4go] start kafka writer ...")
+	log.Printf("[log4go] kafka writer starting")
 	cfg := sarama.NewConfig()
 	cfg.Producer.Return.Successes = k.options.ProducerReturnSuccesses
 	cfg.Producer.Timeout = k.options.ProducerTimeout
@@ -227,7 +219,7 @@ func (k *KafKaWriter) Start() (err error) {
 	k.messages = make(chan *sarama.ProducerMessage, size)
 
 	go k.daemonProducer()
-	log.Printf("[log4go] start kafka writer ok")
+	log.Printf("[log4go] kafka writer started")
 	return err
 }
 

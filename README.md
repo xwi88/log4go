@@ -13,3 +13,9 @@ all-powerful log for go with go module support
 ## ENV
 
 should better use with go, the version >= `1.16`
+
+## Format
+
+### File
+
+>filename regex support: `%Y` `%M` `%D` `%H` `%m`, prefix must be `%`
