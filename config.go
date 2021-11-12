@@ -4,22 +4,35 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"os"
 )
 
 // GlobalLevel global level
 var GlobalLevel = DEBUG
 
+const (
+	WriterNameConsole = "console_writer"
+	WriterNameFile    = "file_writer"
+	WriterNameKafka   = "kafka_writer"
+)
+
 // LogConfig log config
 type LogConfig struct {
 	Level         string               `json:"level" mapstructure:"level"`
+	Debug         bool                 `json:"debug" mapstructure:"debug"` // output log info or not for log4go
 	FullPath      bool                 `json:"full_path" mapstructure:"full_path"`
-	FileWriter    FileWriterOptions    `json:"file_writer" mapstructure:"file_writer"`
 	ConsoleWriter ConsoleWriterOptions `json:"console_writer" mapstructure:"console_writer"`
+	FileWriter    FileWriterOptions    `json:"file_writer" mapstructure:"file_writer"`
 	KafKaWriter   KafKaWriterOptions   `json:"kafka_writer" mapstructure:"kafka_writer"`
 }
 
 // SetupLog setup log
 func SetupLog(lc LogConfig) (err error) {
+	if !lc.Debug {
+		log.SetOutput(ioutil.Discard)
+		defer log.SetOutput(os.Stdout)
+	}
+
 	// global config
 	GlobalLevel = getLevel(lc.Level)
 
@@ -29,51 +42,62 @@ func SetupLog(lc LogConfig) (err error) {
 	validGlobalMinLevel := EMERGENCY // default max level
 	validGlobalMinLevelBy := "global"
 
-	if lc.FileWriter.Enable {
-		validGlobalMinLevel = maxInt(getLevelDefault(lc.FileWriter.Level, GlobalLevel, "file_writer"), validGlobalMinLevel)
-		if validGlobalMinLevel == getLevelDefault(lc.FileWriter.Level, GlobalLevel, "file_writer") {
-			validGlobalMinLevelBy = "file_writer"
+	fileWriterDefault := GlobalLevel
+	consoleWriterDefault := GlobalLevel
+	kafkaWriterDefault := GlobalLevel
+
+	if lc.ConsoleWriter.Enable {
+		consoleWriterDefault = getLevelDefault(lc.ConsoleWriter.Level, GlobalLevel, WriterNameConsole)
+		validGlobalMinLevel = maxInt(consoleWriterDefault, validGlobalMinLevel)
+		if validGlobalMinLevel == consoleWriterDefault {
+			validGlobalMinLevelBy = WriterNameConsole
 		}
 	}
 
-	if lc.ConsoleWriter.Enable {
-		validGlobalMinLevel = maxInt(getLevelDefault(lc.ConsoleWriter.Level, GlobalLevel, "console_writer"), validGlobalMinLevel)
-		if validGlobalMinLevel == getLevelDefault(lc.ConsoleWriter.Level, GlobalLevel, "console_writer") {
-			validGlobalMinLevelBy = "console_writer"
+	if lc.FileWriter.Enable {
+		fileWriterDefault = getLevelDefault(lc.FileWriter.Level, GlobalLevel, WriterNameFile)
+		validGlobalMinLevel = maxInt(fileWriterDefault, validGlobalMinLevel)
+		if validGlobalMinLevel == fileWriterDefault {
+			validGlobalMinLevelBy = WriterNameFile
 		}
 	}
 
 	if lc.KafKaWriter.Enable {
-		validGlobalMinLevel = maxInt(getLevelDefault(lc.KafKaWriter.Level, GlobalLevel, "kafka_writer"), validGlobalMinLevel)
-		if validGlobalMinLevel == getLevelDefault(lc.KafKaWriter.Level, GlobalLevel, "kafka_writer") {
-			validGlobalMinLevelBy = "kafka_writer"
+		kafkaWriterDefault = getLevelDefault(lc.KafKaWriter.Level, GlobalLevel, WriterNameKafka)
+		validGlobalMinLevel = maxInt(kafkaWriterDefault, validGlobalMinLevel)
+		if validGlobalMinLevel == kafkaWriterDefault {
+			validGlobalMinLevelBy = WriterNameKafka
 		}
+
 	}
 
 	fullPath := lc.FullPath
 	WithFullPath(fullPath)
 	SetLevel(validGlobalMinLevel)
 
-	if lc.FileWriter.Enable {
-		w := NewFileWriterWithOptions(lc.FileWriter)
-		w.level = getLevelDefault(lc.FileWriter.Level, GlobalLevel, "file_writer")
+	if lc.ConsoleWriter.Enable {
+		w := NewConsoleWriterWithOptions(lc.ConsoleWriter)
+		w.level = consoleWriterDefault
+		log.Printf("[log4go] enable " + WriterNameConsole + " with level " + LevelFlags[consoleWriterDefault])
 		Register(w)
 	}
 
-	if lc.ConsoleWriter.Enable {
-		w := NewConsoleWriterWithOptions(lc.ConsoleWriter)
-		w.level = getLevelDefault(lc.ConsoleWriter.Level, GlobalLevel, "console_writer")
+	if lc.FileWriter.Enable {
+		w := NewFileWriterWithOptions(lc.FileWriter)
+		w.level = fileWriterDefault
+		log.Printf("[log4go] enable    " + WriterNameFile + " with level " + LevelFlags[fileWriterDefault])
 		Register(w)
 	}
 
 	if lc.KafKaWriter.Enable {
 		w := NewKafKaWriter(lc.KafKaWriter)
-		w.level = getLevelDefault(lc.KafKaWriter.Level, GlobalLevel, "kafka_writer")
+		w.level = kafkaWriterDefault
+		log.Printf("[log4go] enable   " + WriterNameKafka + " with level " + LevelFlags[kafkaWriterDefault])
 		Register(w)
 	}
 
-	log.Printf("log4go validGlobalLevel(min:%v, flag:%v, by:%v, default:%v)",
-		validGlobalMinLevel, LevelFlags[validGlobalMinLevel], validGlobalMinLevelBy, LevelFlags[GlobalLevel])
+	log.Printf("[log4go] valid global_level(min:%v, flag:%v, by:%v), default(%v, flag:%v)",
+		validGlobalMinLevel, LevelFlags[validGlobalMinLevel], validGlobalMinLevelBy, GlobalLevel, LevelFlags[GlobalLevel])
 	return nil
 }
 

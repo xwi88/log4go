@@ -9,6 +9,7 @@ var (
 	logConfig = `{
   "level": "info",
   "full_path": true,
+	"debug": true,
 	
   "file_writer": {
     "level": "warn",
@@ -19,7 +20,8 @@ var (
   "console_writer": {
     "level": "error",
     "enable": true,
-    "color": true
+    "color": true,
+	"full_color": true
   },
 	
   "kafka_writer": {

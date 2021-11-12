@@ -36,7 +36,7 @@ func deleteGenerateLogFile(filename string) {
 }
 func Test_NewFileWriterWithStruct(t *testing.T) {
 	w := &FileWriter{}
-	t.Log(w)
+	t.Logf("%#v", w)
 }
 
 func Test_NewFileWriter(t *testing.T) {
@@ -85,6 +85,7 @@ func Test_NewFileWriterWithErrorPattern(t *testing.T) {
 	w, err := generateNewFileWriterWithOptions(LevelFlagDebug, filename)
 	if err != nil {
 		t.Log(err)
+		return
 	}
 	generateRegisterFileWriter(loggerDefaultTest, w, fullPath, funcName, layout)
 	curFilename := fmt.Sprintf("%s%s", w.filenameOnly, w.suffix)
@@ -174,7 +175,7 @@ func Test_NewFileWriterWithRotate(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	w.initFileOk = true
+	// w.initFileOk = true // forbidden manual set initFileOk
 
 	w.rotate = true
 	w.daily = true
