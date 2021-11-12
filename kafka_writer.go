@@ -190,7 +190,10 @@ func (k *KafKaWriter) Start() (err error) {
 
 	// if want set timestamp for data should set version
 	versionStr := k.options.VersionStr
-	kafkaVer := sarama.V0_10_0_1
+	// now 2.5.0, ref https://kafka.apache.org/downloads#2.5.0
+	// if you use low version kafka, you can specify the versionStr=0.10.0.1, (V0_10_0_1) and
+	// k.options.SpecifyVersion=true
+	kafkaVer := sarama.V2_5_0_0
 
 	if k.options.SpecifyVersion {
 		if versionStr != "" {
@@ -200,7 +203,7 @@ func (k *KafKaWriter) Start() (err error) {
 			}
 		}
 	}
-	// if not specify the version, use the sarama.V0_10_0_1 to guarante the timestamp can be control
+	// if not specify the version, use the sarama.V2_5_0_0 to guarante the timestamp can be control
 	cfg.Version = kafkaVer
 
 	// NewHashPartitioner returns a Partitioner which behaves as follows. If the message's key is nil then a
