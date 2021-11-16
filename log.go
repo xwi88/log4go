@@ -70,8 +70,8 @@ var (
 
 // Record log record
 type Record struct {
-	time  string
 	level int
+	time  string
 	file  string
 	msg   string
 }

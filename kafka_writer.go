@@ -23,19 +23,20 @@ type KafKaMSGFields struct {
 
 // KafKaWriterOptions kafka writer options
 type KafKaWriterOptions struct {
-	Level          string `json:"level" mapstructure:"level"`
-	Enable         bool   `json:"enable" mapstructure:"enable"`
-	BufferSize     int    `json:"buffer_size" mapstructure:"buffer_size"`
-	Debug          bool   `json:"debug" mapstructure:"debug"`                     // if true, will output the send msg
-	SpecifyVersion bool   `json:"specify_version" mapstructure:"specify_version"` // if use the input version, default false
-	VersionStr     string `json:"version" mapstructure:"version"`                 // used to specify the kafka version, ex: 0.10.0.1 or 1.1.1
+	Enable                  bool `json:"enable" mapstructure:"enable"`
+	Debug                   bool `json:"debug" mapstructure:"debug"`                     // if true, will output the send msg
+	SpecifyVersion          bool `json:"specify_version" mapstructure:"specify_version"` // if use the input version, default false
+	ProducerReturnSuccesses bool `json:"producer_return_successes" mapstructure:"producer_return_successes"`
+	BufferSize              int  `json:"buffer_size" mapstructure:"buffer_size"`
+
+	Level      string `json:"level" mapstructure:"level"`
+	VersionStr string `json:"version" mapstructure:"version"` // used to specify the kafka version, ex: 0.10.0.1 or 1.1.1
 
 	Key string `json:"key" mapstructure:"key"` // kafka producer key, choice field
 
-	ProducerTopic           string        `json:"producer_topic" mapstructure:"producer_topic"`
-	ProducerReturnSuccesses bool          `json:"producer_return_successes" mapstructure:"producer_return_successes"`
-	ProducerTimeout         time.Duration `json:"producer_timeout" mapstructure:"producer_timeout"`
-	Brokers                 []string      `json:"brokers" mapstructure:"brokers"`
+	ProducerTopic   string        `json:"producer_topic" mapstructure:"producer_topic"`
+	ProducerTimeout time.Duration `json:"producer_timeout" mapstructure:"producer_timeout"`
+	Brokers         []string      `json:"brokers" mapstructure:"brokers"`
 
 	MSG KafKaMSGFields `json:"msg"`
 }
