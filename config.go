@@ -42,33 +42,32 @@ func SetupLog(lc LogConfig) (err error) {
 	validGlobalMinLevel := EMERGENCY // default max level
 	validGlobalMinLevelBy := "global"
 
-	fileWriterDefault := GlobalLevel
-	consoleWriterDefault := GlobalLevel
-	kafkaWriterDefault := GlobalLevel
+	fileWriterLevelDefault := GlobalLevel
+	consoleWriterLevelDefault := GlobalLevel
+	kafkaWriterLevelDefault := GlobalLevel
 
 	if lc.ConsoleWriter.Enable {
-		consoleWriterDefault = getLevelDefault(lc.ConsoleWriter.Level, GlobalLevel, WriterNameConsole)
-		validGlobalMinLevel = maxInt(consoleWriterDefault, validGlobalMinLevel)
-		if validGlobalMinLevel == consoleWriterDefault {
+		consoleWriterLevelDefault = getLevelDefault(lc.ConsoleWriter.Level, GlobalLevel, WriterNameConsole)
+		validGlobalMinLevel = maxInt(consoleWriterLevelDefault, validGlobalMinLevel)
+		if validGlobalMinLevel == consoleWriterLevelDefault {
 			validGlobalMinLevelBy = WriterNameConsole
 		}
 	}
 
 	if lc.FileWriter.Enable {
-		fileWriterDefault = getLevelDefault(lc.FileWriter.Level, GlobalLevel, WriterNameFile)
-		validGlobalMinLevel = maxInt(fileWriterDefault, validGlobalMinLevel)
-		if validGlobalMinLevel == fileWriterDefault {
+		fileWriterLevelDefault = getLevelDefault(lc.FileWriter.Level, GlobalLevel, WriterNameFile)
+		validGlobalMinLevel = maxInt(fileWriterLevelDefault, validGlobalMinLevel)
+		if validGlobalMinLevel == fileWriterLevelDefault {
 			validGlobalMinLevelBy = WriterNameFile
 		}
 	}
 
 	if lc.KafKaWriter.Enable {
-		kafkaWriterDefault = getLevelDefault(lc.KafKaWriter.Level, GlobalLevel, WriterNameKafka)
-		validGlobalMinLevel = maxInt(kafkaWriterDefault, validGlobalMinLevel)
-		if validGlobalMinLevel == kafkaWriterDefault {
+		kafkaWriterLevelDefault = getLevelDefault(lc.KafKaWriter.Level, GlobalLevel, WriterNameKafka)
+		validGlobalMinLevel = maxInt(kafkaWriterLevelDefault, validGlobalMinLevel)
+		if validGlobalMinLevel == kafkaWriterLevelDefault {
 			validGlobalMinLevelBy = WriterNameKafka
 		}
-
 	}
 
 	fullPath := lc.FullPath
@@ -77,22 +76,22 @@ func SetupLog(lc LogConfig) (err error) {
 
 	if lc.ConsoleWriter.Enable {
 		w := NewConsoleWriterWithOptions(lc.ConsoleWriter)
-		w.level = consoleWriterDefault
-		log.Printf("[log4go] enable " + WriterNameConsole + " with level " + LevelFlags[consoleWriterDefault])
+		w.level = consoleWriterLevelDefault
+		log.Printf("[log4go] enable " + WriterNameConsole + " with level " + LevelFlags[consoleWriterLevelDefault])
 		Register(w)
 	}
 
 	if lc.FileWriter.Enable {
 		w := NewFileWriterWithOptions(lc.FileWriter)
-		w.level = fileWriterDefault
-		log.Printf("[log4go] enable    " + WriterNameFile + " with level " + LevelFlags[fileWriterDefault])
+		w.level = fileWriterLevelDefault
+		log.Printf("[log4go] enable    " + WriterNameFile + " with level " + LevelFlags[fileWriterLevelDefault])
 		Register(w)
 	}
 
 	if lc.KafKaWriter.Enable {
 		w := NewKafKaWriter(lc.KafKaWriter)
-		w.level = kafkaWriterDefault
-		log.Printf("[log4go] enable   " + WriterNameKafka + " with level " + LevelFlags[kafkaWriterDefault])
+		w.level = kafkaWriterLevelDefault
+		log.Printf("[log4go] enable   " + WriterNameKafka + " with level " + LevelFlags[kafkaWriterLevelDefault])
 		Register(w)
 	}
 

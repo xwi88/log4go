@@ -89,10 +89,10 @@ type ConsoleWriter struct {
 
 // ConsoleWriterOptions color field options
 type ConsoleWriterOptions struct {
-	Level     string `json:"level" mapstructure:"level"`
 	Enable    bool   `json:"enable" mapstructure:"enable"`
 	Color     bool   `json:"color" mapstructure:"color"`
 	FullColor bool   `json:"full_color" mapstructure:"full_color"`
+	Level     string `json:"level" mapstructure:"level"`
 }
 
 // NewConsoleWriter create new console writer
@@ -104,7 +104,7 @@ func NewConsoleWriter() *ConsoleWriter {
 func NewConsoleWriterWithOptions(options ConsoleWriterOptions) *ConsoleWriter {
 	defaultLevel := DEBUG
 
-	if len(options.Level) != defaultLevel {
+	if len(options.Level) > 0 {
 		defaultLevel = getLevelDefault(options.Level, defaultLevel, "")
 	}
 

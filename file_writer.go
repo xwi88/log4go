@@ -21,12 +21,12 @@ var pathVariableTable map[byte]func(*time.Time) int
 type FileWriter struct {
 	// write log order by order and atomic incr
 	// maxLinesCurLines and maxSizeCurSize
+	level        int
 	lock         sync.RWMutex
 	initFileOnce sync.Once // init once
-	initFileOk   bool
 
-	level int
-
+	rotatePerm os.FileMode // real used
+	perm       string      // input
 	// input filename
 	filename string
 	// The opened file
@@ -39,10 +39,6 @@ type FileWriter struct {
 	actions   []func(*time.Time) int
 	variables []interface{}
 
-	rotate     bool
-	perm       string      // input
-	rotatePerm os.FileMode // real used
-
 	// // Rotate at file lines
 	// maxLines         int // Rotate at line
 	// maxLinesCurLines int
@@ -52,20 +48,26 @@ type FileWriter struct {
 	// maxSizeCurSize int
 
 	lastWriteTime time.Time
+
+	initFileOk bool
+	rotate     bool
 	// Rotate daily
-	daily         bool
+	daily bool
+	// Rotate hourly
+	hourly bool
+	// Rotate minutely
+	minutely bool
+
 	maxDays       int
 	dailyOpenDate int
 	dailyOpenTime time.Time
 
 	// Rotate hourly
-	hourly         bool
 	maxHours       int
 	hourlyOpenDate int
 	hourlyOpenTime time.Time
 
 	// Rotate minutely
-	minutely         bool
 	maxMinutes       int
 	minutelyOpenDate int
 	minutelyOpenTime time.Time
@@ -74,22 +76,20 @@ type FileWriter struct {
 // FileWriterOptions file writer options
 type FileWriterOptions struct {
 	Level    string `json:"level" mapstructure:"level"`
-	Enable   bool   `json:"enable" mapstructure:"enable"`
 	Filename string `json:"filename" mapstructure:"filename"`
+	Enable   bool   `json:"enable" mapstructure:"enable"`
 
 	Rotate bool `json:"rotate" mapstructure:"rotate"`
-
 	// Rotate daily
-	Daily   bool `json:"daily" mapstructure:"daily"`
-	MaxDays int  `json:"max_days" mapstructure:"max_days"`
-
+	Daily bool `json:"daily" mapstructure:"daily"`
 	// Rotate hourly
-	Hourly   bool `json:"hourly" mapstructure:"hourly"`
-	MaxHours int  `json:"max_hours" mapstructure:"max_hours"`
-
+	Hourly bool `json:"hourly" mapstructure:"hourly"`
 	// Rotate minutely
-	Minutely   bool `json:"minutely" mapstructure:"minutely"`
-	MaxMinutes int  `json:"max_minutes" mapstructure:"max_minutes"`
+	Minutely bool `json:"minutely" mapstructure:"minutely"`
+
+	MaxDays    int `json:"max_days" mapstructure:"max_days"`
+	MaxHours   int `json:"max_hours" mapstructure:"max_hours"`
+	MaxMinutes int `json:"max_minutes" mapstructure:"max_minutes"`
 }
 
 // NewFileWriter create new file writer
@@ -100,7 +100,7 @@ func NewFileWriter() *FileWriter {
 // NewFileWriterWithOptions create new file writer with options
 func NewFileWriterWithOptions(options FileWriterOptions) *FileWriter {
 	defaultLevel := DEBUG
-	if len(options.Level) != defaultLevel {
+	if len(options.Level) > 0 {
 		defaultLevel = getLevelDefault(options.Level, defaultLevel, "")
 	}
 	fileWriter := &FileWriter{
