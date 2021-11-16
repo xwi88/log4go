@@ -56,7 +56,7 @@ type KafKaWriter struct {
 // NewKafKaWriter new kafka writer
 func NewKafKaWriter(options KafKaWriterOptions) *KafKaWriter {
 	defaultLevel := DEBUG
-	if len(options.Level) != defaultLevel {
+	if len(options.Level) > 0 {
 		defaultLevel = getLevelDefault(options.Level, defaultLevel, "")
 	}
 

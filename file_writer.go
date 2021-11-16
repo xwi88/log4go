@@ -100,7 +100,7 @@ func NewFileWriter() *FileWriter {
 // NewFileWriterWithOptions create new file writer with options
 func NewFileWriterWithOptions(options FileWriterOptions) *FileWriter {
 	defaultLevel := DEBUG
-	if len(options.Level) != defaultLevel {
+	if len(options.Level) > 0 {
 		defaultLevel = getLevelDefault(options.Level, defaultLevel, "")
 	}
 	fileWriter := &FileWriter{
