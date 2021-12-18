@@ -28,3 +28,9 @@ The go version shall >= `1.16`
 
 >Can writer to kafka easily, with `es_index` you can also transfer data to ES easily. If you want more fields can set
 > them by the field `msg.extra_fields`.
+
+## Thanks
+
+- [OpenSourceSupport](https://jb.gg/OpenSourceSupport)
+
+![JetBrains Logo (Main) logo](https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg)
